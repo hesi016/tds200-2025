@@ -1,75 +1,172 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  FlatList,
+  Text,
+  Pressable,
+} from "react-native";
+import Toast from 'react-native-toast-message';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { useState, useCallback } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import { getAllPosts, addNewPost } from "@/utils/asyncPostData";
+import { PostData } from "@/utils/postData";
+import Post from "@/components/Post";
+import Spacer from "@/components/Spacer";
+import React from "react";
+import { useLayoutEffect } from "react";
+import { useNavigation } from "@react-navigation/native";
+import { Storage } from "@/utils/storage";
 
-export default function HomeScreen() {
+export default function Index() {
+  const [posts, setPosts] = useState<PostData[]>([]);
+  const [userName, setUserName] = useState<string | null>(null);
+  const [isEmpty, setIsEmpty] = useState(true);
+  const navigation = useNavigation();
+
+  const checkIfStorageEmpty = async () => {
+    const keys = await Storage.getAllKeys();
+    setIsEmpty(keys.length === 0);
+  };
+
+
+    const showToast = (type: 'success' | 'error', text1: string, text2?: string) => {
+      Toast.show({
+        type,
+        text1,
+        text2,
+        position: 'top',
+        visibilityTime: 3000,
+        onHide: () => {
+          console.log("Toast is gone, you can trigger something now.");
+        },
+      });
+    };
+
+const clearStorage = async () => {
+  try {
+    await Storage.clearStorage();
+    showToast("success", "Storage cleared");
+    setPosts([]);
+    setUserName(null);
+    await checkIfStorageEmpty();
+  } catch (error) {
+    console.error("Failed to clear storage:", error);
+    showToast("error", "Failed to clear storage", String(error));
+  }
+};
+
+
+
+const createDummyPost = async (): Promise<PostData> => {
+  const existingUser = await Storage.getItem("currentUserEmail");
+  const now = new Date();
+  const formattedTime = now.toLocaleString(); 
+
+  return {
+    id: Date.now().toString(),
+    title: `Post created at ${formattedTime}`,
+    description: `Dette er en dummy post opprettet kl ${formattedTime}.`,
+    hashtags: "#dummy #ny",
+    author: existingUser || "Anonym",
+  };
+};
+  useFocusEffect(
+    useCallback(() => {
+      const fetchData = async () => {
+        const postsData = await getAllPosts();
+        setPosts(postsData);
+
+        const storedEmail = await Storage.getItem("currentUserEmail");
+
+        if (storedEmail) {
+          const storedUser = await Storage.getItem(`user:${storedEmail}`);
+          if (storedUser) {
+            const parsedUser = JSON.parse(storedUser);
+            setUserName(parsedUser.email || storedEmail);
+          } else {
+            setUserName(null);
+          }
+        } else {
+          setUserName(null);
+        }
+      };
+
+      fetchData();
+      checkIfStorageEmpty();
+
+    }, [])
+  );
+
+    useLayoutEffect(() => {
+      navigation.setOptions({
+        headerRight: () => (
+          <Pressable
+            style={{ paddingRight: 12 }}
+            onPress={async () => {
+              const newPost = await createDummyPost();
+              setPosts((prev) => [...prev, newPost]);
+              await addNewPost(newPost);
+              await checkIfStorageEmpty();
+              showToast("success", "Ny post lagt til");
+            }}
+          >
+            <Text style={{ color: "#007AFF" }}>+ Ny</Text>
+          </Pressable>
+        ),
+      });
+    }, [navigation, setPosts]);
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <View style={styles.titleContainer}>
+      {userName && (
+        <Text style={styles.userNameText}>Hei, {userName}!</Text>
+      )}
+
+      <FlatList
+        style={{ width: "100%", paddingHorizontal: 20 }}
+        data={posts}
+        ListHeaderComponent={() => <Spacer height={10} />}
+        ListFooterComponent={() => <Spacer height={50} />}
+        ItemSeparatorComponent={() => <Spacer height={8} />}
+        renderItem={(post) => <Post postData={post.item} />}
+      />
+          <Pressable
+          style={[
+            styles.clearButton,
+            isEmpty ? styles.clearButtonDisabled : styles.clearButtonActive,
+          ]}
+            onPress={() => clearStorage()}
+            disabled={isEmpty}
+          >
+            <Text>Clear Storage</Text>
+          </Pressable>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  userNameText: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 10,
+    color: "#333",
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  clearButton: {
+    paddingVertical: 12,
+    borderRadius: 6,
+    alignItems: "center",
+    width: "100%",
+  },
+  clearButtonActive: {
+    backgroundColor: "red", // active state
+  },
+  clearButtonDisabled: {
+    backgroundColor: "gray", // disabled state
   },
 });
