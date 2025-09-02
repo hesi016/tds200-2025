@@ -5,9 +5,8 @@ import {
   FlatList,
   Pressable
 } from "react-native";
-import { useState } from "react";
+import React, { useState } from "react";
 import Spacer from "@/components/Spacer"; // If Spacer is still needed
-import React from "react";
 import { getAllPosts } from "@/utils/dummyPostData";
 import { PostData } from "@/utils/postData";
 import AntDesign from "@expo/vector-icons/AntDesign";
