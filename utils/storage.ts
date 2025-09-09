@@ -1,11 +1,60 @@
 import { Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Device from "expo-device";
 
 export const Storage = {
+
+  getAllKeys: async (): Promise<string[]> => {
+    if (Platform.OS === "web" || (Platform.OS === "ios" && !Device.isDevice) || (Platform.OS === "" && !Device.isDevice)) {
+      const keys = await AsyncStorage.getAllKeys();
+      return keys || [];
+    } else {
+      const allKeysStr = await SecureStore.getItemAsync("allKeys");
+      if (allKeysStr) {
+        const keys = JSON.parse(allKeysStr);
+        return Array.isArray(keys) ? keys : [];
+      }
+      return [];
+    }
+  },
+
+
+  clearStorage: async (): Promise<void> => {
+  try {
+    if (Platform.OS === "web" || (Platform.OS === "ios" && !Device.isDevice) || (Platform.OS === "android" && !Device.isDevice)) {
+ 
+      // AsyncStorage for web or iOS simulator
+        const keys = await AsyncStorage.getAllKeys();
+        if (keys.length === 0) {
+          console.log("Storage is already empty");
+        } else {
+          await AsyncStorage.clear();
+          console.log("AsyncStorage cleared");
+        }
+    } else {
+      // SecureStore for physical devices
+      const allKeys = await SecureStore.getItemAsync("allKeys"); 
+      // SecureStore doesn’t support "clear()", you need to track keys
+      if (allKeys) {
+        const keys = JSON.parse(allKeys);
+        for (const key of keys) {
+          await SecureStore.deleteItemAsync(key);
+        }
+        await SecureStore.deleteItemAsync("allKeys");
+      }
+      console.log("SecureStore cleared");
+    }
+  } catch (error) {
+    console.error("Failed to clear storage:", error);
+  }
+},
+
+
   setItem: async (key: string, value: string): Promise<void> => {
     try {
-      if (Platform.OS === "web") {
+    if (Platform.OS === "web" || (Platform.OS === "ios" && !Device.isDevice) || (Platform.OS === "android" && !Device.isDevice)) {
+ 
         await AsyncStorage.setItem(key, value);
       } else {
         await SecureStore.setItemAsync(key, value);
@@ -17,7 +66,8 @@ export const Storage = {
 
   getItem: async (key: string): Promise<string | null> => {
     try {
-      if (Platform.OS === "web") {
+    if (Platform.OS === "web" || (Platform.OS === "ios" && !Device.isDevice) || (Platform.OS === "android" && !Device.isDevice)) {
+ 
         return await AsyncStorage.getItem(key);
       } else {
         return await SecureStore.getItemAsync(key);
@@ -30,7 +80,8 @@ export const Storage = {
 
   deleteItem: async (key: string): Promise<void> => {
     try {
-      if (Platform.OS === "web") {
+    if (Platform.OS === "web" || (Platform.OS === "ios" && !Device.isDevice) || (Platform.OS === "android" && !Device.isDevice)) {
+ 
         await AsyncStorage.removeItem(key);
       } else {
         await SecureStore.deleteItemAsync(key);

@@ -5,5 +5,11 @@ export interface PostData {
     hashtags: string;
     author: string;
     isLiked?: boolean;
-    image?: string;
+    comments?: CommentData[];
   }
+
+  export interface CommentData {
+  id: string;
+  authorId: string;
+  comment: string;
+}

@@ -123,7 +123,7 @@ export default function postDetails() {
             {isLoadingAddComment ? (
               <ActivityIndicator size="small" color="#fff" />
             ) : (
-              <Text style={styles.addCommentButtonText}>Post</Text>
+              <Text style={styles.addCommentButtonText}>add comment</Text>
             )}
           </Pressable>
         </View>
