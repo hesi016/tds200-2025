@@ -13,6 +13,7 @@ import React from "react";
 import SelectImageModal from "./SelectImageModal";
 import { EvilIcons } from "@expo/vector-icons";
 import { Storage } from "@/utils/storage";
+import { AntDesign } from "@expo/vector-icons";
 
 type PostFormProps = {
   addNewPost: (post: PostData) => void;
@@ -66,6 +67,12 @@ export default function PostForm({ addNewPost, closeModal }: PostFormProps) {
             <EvilIcons name="image" size={80} color="gray" />
           )}
         </Pressable>
+
+        <AntDesign
+            name="smile"
+            size={24}
+            color={"gray"}
+          />
 
         <View style={styles.textFieldContainer}>
           <Text style={styles.text}>Tittel</Text>
@@ -128,6 +135,7 @@ export default function PostForm({ addNewPost, closeModal }: PostFormProps) {
               Avbryt
             </Text>
           </Pressable>
+                    
         </View>
       </View>
       </ScrollView>

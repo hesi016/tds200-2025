@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, Pressable } from "react-native";
-import AntDesign from "@expo/vector-icons/AntDesign";
+import { AntDesign } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { PostData } from "@/utils/postData";
 import React from "react";
@@ -37,7 +37,7 @@ export default function Post({ postData, toggleLike }: PostProps) {
           style={styles.likeButton}
         >
           <AntDesign
-            name="smileo"
+            name="smile"
             size={24}
             color={postData.isLiked ? "#23C9FF" : "gray"}
           />
