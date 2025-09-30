@@ -1,60 +1,51 @@
+import * as React from "react";
 import { Tabs } from "expo-router";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { Text } from "react-native";
-import React = require("react");
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
-const TabsLayout = () => {
+export default function TabsLayout() {
   return (
-    <Tabs>
+    <Tabs screenOptions={{ headerShown: false }}>
       <Tabs.Screen
         name="home"
         options={{
-          headerShown: false, 
-          title: "Hjem",
-          tabBarIcon: ({ color, focused }) => (
-            // Ikon hentet fra https://icons.expo.fyi/Index, en ikondatabase for expo. Prøv dere fram med egne ikoner ved å følge lenken!
-            <AntDesign name="home" size={24} color={color} />
+          title: "Home",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home" size={size} color={color} />
           ),
-          headerTitle(props) {
-            return (
-              <Text
-                style={{
-                  fontSize: 20,
-                  fontWeight: "bold",
-                  color: "black",
-                }}
-              >
-                Hjemmeside
-              </Text>
-            );
-          },
         }}
       />
+
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "Profile",
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome6 name="person" size={size} color={color} />
+          ),
+        }}
+      />
+
       <Tabs.Screen
         name="authentication"
         options={{
-          title: "Sign up",
-          tabBarIcon: ({ color, focused }) => (
-            // Ikon hentet fra https://icons.expo.fyi/Index, en ikondatabase for expo. Prøv dere fram med egne ikoner ved å følge lenken!
-            <AntDesign name="user" size={24} color={color} />
+          title: "Authentication",
+          tabBarIcon: ({ color, size }) => (
+            <AntDesign name="edit" size={size} color={color} />
           ),
-          headerTitle(props) {
-            return (
-              <Text
-                style={{
-                  fontSize: 20,
-                  fontWeight: "bold",
-                  color: "black",
-                }}
-              >
-                Sign up
-              </Text>
-            );
-          },
+        }}
+      />
+
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: "Settings",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="settings" size={size} color={color} />
+          ),
         }}
       />
     </Tabs>
   );
-};
-
-export default TabsLayout;
+}
