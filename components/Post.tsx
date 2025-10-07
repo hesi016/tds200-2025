@@ -1,8 +1,8 @@
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { PostData } from "@/utils/postData";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { Link } from "expo-router";
-import { PostData } from "@/utils/postData";
-import React = require("react");
+import React from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 type PostProps = {
   postData: PostData;
@@ -30,8 +30,7 @@ export default function Post({ postData, toggleLike }: PostProps) {
         {/* Like button separate from navigation */}
         <Pressable
           onPress={async () => {
-              toggleLike(postData.id);
-
+            toggleLike(postData.id);
           }}
           style={styles.likeButton}
         >

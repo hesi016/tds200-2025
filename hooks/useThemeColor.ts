@@ -3,20 +3,29 @@
  * https://docs.expo.dev/guides/color-schemes/
  */
 
-import { useColorScheme } from 'react-native';
-
 import { Colors } from '@/constants/Colors';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useEffect, useState } from 'react';
+import { useColorScheme } from 'react-native';
 
 export function useThemeColor(
   props: { light?: string; dark?: string },
   colorName: keyof typeof Colors.light & keyof typeof Colors.dark
 ) {
-  const theme = useColorScheme() ?? 'light';
-  const colorFromProps = props[theme];
+  const system = useColorScheme() ?? 'light';
+  const [storedTheme, setStoredTheme] = useState<"light" | "dark" | null>(null);
 
-  if (colorFromProps) {
-    return colorFromProps;
-  } else {
-    return Colors[theme][colorName];
-  }
+
+  useEffect(() => {
+    (async () => {
+      const saved = await AsyncStorage.getItem("darkMode");
+      if(saved === "true") setStoredTheme("dark");
+      if(saved === "false") setStoredTheme("light");
+    })();
+  }, []);
+
+const theme = storedTheme ?? system;
+const colorFromProps = props[theme];
+return colorFromProps ?? Colors[theme][colorName];
+
 }
