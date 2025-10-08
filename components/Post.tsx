@@ -1,4 +1,4 @@
-import { View, Text, Pressable, Image } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { PostData } from "@/utils/postData";
