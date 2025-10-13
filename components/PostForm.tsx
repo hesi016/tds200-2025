@@ -20,6 +20,7 @@ interface PostFormProps {
 export default function PostForm({ onSubmit, onCancel }: PostFormProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [hashtag, setHashtags] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -34,6 +35,7 @@ export default function PostForm({ onSubmit, onCancel }: PostFormProps) {
       id: Date.now().toString(),
       title: title.trim(),
       description: description.trim(),
+      hashtags: hashtag.trim().split(" ").filter(Boolean),
     };
 
     setSubmitting(true);
@@ -63,6 +65,14 @@ export default function PostForm({ onSubmit, onCancel }: PostFormProps) {
           value={description}
           onChangeText={setDescription}
           placeholder="Hva har du på hjertet?"
+        />
+
+        <Text style={styles.label}> Hashtag</Text>
+        <TextInput
+          style={styles.input}
+          value={hashtag}
+          onChangeText={setHashtags}
+          placeholder="#hvafølerdufor #relevant"
         />
 
         {error ? <Text style={styles.error}> {error}</Text> : null}
