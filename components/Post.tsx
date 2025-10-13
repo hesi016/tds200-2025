@@ -1,16 +1,14 @@
 import { View, Text, StyleSheet, Pressable } from "react-native";
-import { useState } from "react";
+import React, { useState } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { Link } from "expo-router";
 import { PostData } from "@/utils/postData";
-import React from "react";
 
 type PostProps = {
   postData: PostData;
 };
 
 export default function Post({ postData }: PostProps) {
-  
   const [liked, setLiked] = useState(false);
 
   return (
@@ -31,7 +29,6 @@ export default function Post({ postData }: PostProps) {
 
           <Pressable
             onPress={(event) => {
-              event.stopPropagation(); // This has no effect here; safe to remove
               setLiked(!liked);
             }}
           >
@@ -60,7 +57,6 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     paddingHorizontal: 10,
-    paddingTop: 16,
   },
   titleContainer: {
     flexDirection: "row",
@@ -76,5 +72,4 @@ const styles = StyleSheet.create({
     paddingTop: 6,
     color: "gray",
   },
-
 });
