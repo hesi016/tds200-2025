@@ -1,15 +1,14 @@
 import { PostData } from "@/utils/postData";
-import { useState, useEffect } from "react";
-import { 
-  Pressable, 
-  StyleSheet, 
-  TextInput, 
-  Text, 
-  View, 
-  Modal, 
+import React, { useState, useEffect } from "react";
+import {
+  Pressable,
+  StyleSheet,
+  TextInput,
+  Text,
+  View,
   ScrollView,
-  } from "react-native";
-import React = require("react");
+  SafeAreaView,
+} from "react-native";
 
 import { Storage } from "@/utils/storage";
 
@@ -33,78 +32,79 @@ export default function PostForm({ addNewPost, closeModal }: PostFormProps) {
     fetchUser();
   }, []);
 
-
   return (
-    <View style={styles.mainContainer}>
-      <ScrollView
-        keyboardDismissMode="interactive"
-        automaticallyAdjustKeyboardInsets
-      >
-      <View style={styles.contentContainer}>
-         <View style={styles.textFieldContainer}>
-          <Text style={styles.text}>Tittel</Text>
-          <TextInput
-            onChangeText={setTitleText}
-            value={titleText}
-            style={styles.textfield}
-            placeholder="Skriv inn tittel"
-          />
-        </View>
-        <View style={styles.textFieldContainer}>
-          <Text style={styles.text}>Beskrivelse</Text>
-          <TextInput
-            multiline
-            numberOfLines={3}
-            onChangeText={setDescriptionText}
-            value={descriptionText}
-            style={[styles.textfield, { height: 84 }]}
-            placeholder="Skriv inn beskrivelse"
-          />
-        </View>
-        <View style={styles.textFieldContainer}>
-          <Text style={styles.text}>Hashtags</Text>
-          <TextInput
-            onChangeText={setHashtagText}
-            value={hashtagText}
-            style={styles.textfield}
-            placeholder="#kultur #natur #mat"
-          />
-        </View>
-        <View style={styles.buttonContainer}>
-          <Pressable
-            style={styles.primaryButton}
-            onPress={() => {
-              addNewPost({
-                title: titleText,
-                description: descriptionText,
-                id: `postName-${Date.now().toString()}-${titleText}`,
-                hashtags: hashtagText,
-                author: existingUser || "Anonym",
-                isLiked: false,
-              });
-              setTitleText("");
-              setDescriptionText("");
-              setHashtagText("");
-            }}
-          >
-            <Text style={{ color: "white" }}>Legg til post</Text>
-          </Pressable>
-          <Pressable
-            style={styles.secondaryButton}
-            onPress={() => closeModal()}
-          >
-            <Text
-              style={{
-                color: "#412E25",
-              }}
-            >
-              Avbryt
-            </Text>
-          </Pressable>
-        </View>
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.mainContainer}>
+        <ScrollView
+          keyboardDismissMode="interactive"
+          automaticallyAdjustKeyboardInsets
+        >
+          <View style={styles.contentContainer}>
+            <View style={styles.textFieldContainer}>
+              <Text style={styles.text}>Tittel</Text>
+              <TextInput
+                onChangeText={setTitleText}
+                value={titleText}
+                style={styles.textfield}
+                placeholder="Skriv inn tittel"
+              />
+            </View>
+            <View style={styles.textFieldContainer}>
+              <Text style={styles.text}>Beskrivelse</Text>
+              <TextInput
+                multiline
+                numberOfLines={3}
+                onChangeText={setDescriptionText}
+                value={descriptionText}
+                style={[styles.textfield, { height: 84 }]}
+                placeholder="Skriv inn beskrivelse"
+              />
+            </View>
+            <View style={styles.textFieldContainer}>
+              <Text style={styles.text}>Hashtags</Text>
+              <TextInput
+                onChangeText={setHashtagText}
+                value={hashtagText}
+                style={styles.textfield}
+                placeholder="#kultur #natur #mat"
+              />
+            </View>
+            <View style={styles.buttonContainer}>
+              <Pressable
+                style={styles.primaryButton}
+                onPress={() => {
+                  addNewPost({
+                    title: titleText,
+                    description: descriptionText,
+                    id: `postName-${Date.now().toString()}-${titleText}`,
+                    hashtags: hashtagText,
+                    author: existingUser || "Anonym",
+                    isLiked: false,
+                  });
+                  setTitleText("");
+                  setDescriptionText("");
+                  setHashtagText("");
+                }}
+              >
+                <Text style={{ color: "white" }}>Legg til post</Text>
+              </Pressable>
+              <Pressable
+                style={styles.secondaryButton}
+                onPress={() => closeModal()}
+              >
+                <Text
+                  style={{
+                    color: "#412E25",
+                  }}
+                >
+                  Avbryt
+                </Text>
+              </Pressable>
+            </View>
+          </View>
+        </ScrollView>
       </View>
-      </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 

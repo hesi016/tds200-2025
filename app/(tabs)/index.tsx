@@ -6,7 +6,7 @@ import {
   FlatList,
   Modal,
 } from "react-native";
-import { useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import { Storage } from "@/utils/storage";
@@ -15,14 +15,13 @@ import { PostData } from "@/utils/postData";
 import { getAllPosts } from "@/utils/asyncPostData";
 import Post from "@/components/Post";
 import Spacer from "@/components/Spacer";
-import React = require("react");
 
 export default function Index() {
   const [posts, setPosts] = useState<PostData[]>([]);
   const [userName, setUserName] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-useFocusEffect(
+  useFocusEffect(
     useCallback(() => {
       const fetchData = async () => {
         const postsData = await getAllPosts();
@@ -46,7 +45,6 @@ useFocusEffect(
       fetchData();
     }, [])
   );
-
 
   return (
     <View style={styles.titleContainer}>
@@ -91,7 +89,7 @@ useFocusEffect(
           <Post
             key={post.index}
             postData={post.item}
-            toggleLike={async(id) => {
+            toggleLike={async (id) => {
               const tempPosts = posts.map((tempPost) => {
                 if (tempPost.id === id) {
                   return { ...tempPost, isLiked: !tempPost.isLiked };
@@ -136,4 +134,3 @@ const styles = StyleSheet.create({
     position: "absolute",
   },
 });
-
