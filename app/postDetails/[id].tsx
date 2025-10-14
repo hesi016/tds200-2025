@@ -1,10 +1,10 @@
+import { PostData } from "@/utils/postData";
 import { Storage } from "@/utils/storage";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { Text, View, StyleSheet, Image } from "react-native";
-import { useState, useEffect } from "react";
-import { PostData } from "@/utils/postData";
+import { useEffect, useState } from "react";
+import { Image, StyleSheet, Text, View } from "react-native";
 
-export default function postDetails() {
+export default function PostDetails() {
   const { id } = useLocalSearchParams();
   const [post, setPost] = useState<PostData | null>(null);
 
@@ -14,19 +14,18 @@ export default function postDetails() {
         try {
           const posts = await Storage.getItem("posts");
           if (posts !== null) {
-              const parsedPosts = JSON.parse(posts);
-              const post = parsedPosts.find((post: any) => post.id === id);
-              setPost(post || null);
+            const parsedPosts = JSON.parse(posts);
+            const post = parsedPosts.find((post: any) => post.id === id);
+            setPost(post || null);
           }
         } catch (e) {
-            console.error(e);
+          console.error(e);
         }
       }
     };
 
     fetchPostData();
   }, [id]);
-
 
   return (
     <View
@@ -42,17 +41,16 @@ export default function postDetails() {
           //headerShown: false
         }}
       />
-          <View style={styles.textContainer}>
-            <Text>{post?.title}</Text>
-            <Text style={styles.postHashtags}>{post?.hashtags}</Text>
-            <Text style={styles.authorText}>{post?.author}</Text>
-          </View>
-          <Image
-            source={{ uri: post?.image }}
-            style={{ resizeMode: "cover", width: "100%", height: 300 }}
-            alt="Hmmmmm"
-            />
-
+      <View style={styles.textContainer}>
+        <Text>{post?.title}</Text>
+        <Text style={styles.postHashtags}>{post?.hashtags}</Text>
+        <Text style={styles.authorText}>{post?.author}</Text>
+      </View>
+      <Image
+        source={{ uri: post?.image }}
+        style={{ resizeMode: "cover", width: "100%", height: 300 }}
+        alt="Hmmmmm"
+      />
     </View>
   );
 }

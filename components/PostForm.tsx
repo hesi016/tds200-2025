@@ -1,19 +1,18 @@
 import { PostData } from "@/utils/postData";
-import { useState, useEffect } from "react";
-import { 
-  Pressable, 
-  StyleSheet, 
-  TextInput, 
-  Text, 
-  View, 
-  Modal, 
-  ScrollView,
-  Image } from "react-native";
-import React from "react";
-import SelectImageModal from "./SelectImageModal";
-import { EvilIcons } from "@expo/vector-icons";
 import { Storage } from "@/utils/storage";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, EvilIcons } from "@expo/vector-icons";
+import React, { useEffect, useState } from "react";
+import {
+  Image,
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import SelectImageModal from "./SelectImageModal";
 
 type PostFormProps = {
   addNewPost: (post: PostData) => void;
@@ -37,107 +36,101 @@ export default function PostForm({ addNewPost, closeModal }: PostFormProps) {
     fetchUser();
   }, []);
 
-
   return (
     <View style={styles.mainContainer}>
       <ScrollView
         keyboardDismissMode="interactive"
         automaticallyAdjustKeyboardInsets
       >
-      <View style={styles.contentContainer}>
-        <Modal visible={isCameraOpen} animationType="slide">
-          <SelectImageModal
-            closeModal={() => {
-              setIsCameraOpen(false);
-            }}
-            setImage={setImage}
-          />
-        </Modal>
-        <Pressable
-          onPress={() => setIsCameraOpen(true)}
-          style={styles.addImageBox}
-        >
-          {image ? (
-            <Image
-              source={{ uri: image }}
-              style={{ resizeMode: "cover", width: "100%", height: 300 }}
-              alt="Hmmmmm"
+        <View style={styles.contentContainer}>
+          <Modal visible={isCameraOpen} animationType="slide">
+            <SelectImageModal
+              closeModal={() => {
+                setIsCameraOpen(false);
+              }}
+              setImage={setImage}
             />
-          ) : (
-            <EvilIcons name="image" size={80} color="gray" />
-          )}
-        </Pressable>
-
-        <AntDesign
-            name="smile"
-            size={24}
-            color={"gray"}
-          />
-
-        <View style={styles.textFieldContainer}>
-          <Text style={styles.text}>Tittel</Text>
-          <TextInput
-            onChangeText={setTitleText}
-            value={titleText}
-            style={styles.textfield}
-            placeholder="Skriv inn tittel"
-          />
-        </View>
-        <View style={styles.textFieldContainer}>
-          <Text style={styles.text}>Beskrivelse</Text>
-          <TextInput
-            multiline
-            numberOfLines={3}
-            onChangeText={setDescriptionText}
-            value={descriptionText}
-            style={[styles.textfield, { height: 84 }]}
-            placeholder="Skriv inn beskrivelse"
-          />
-        </View>
-        <View style={styles.textFieldContainer}>
-          <Text style={styles.text}>Hashtags</Text>
-          <TextInput
-            onChangeText={setHashtagText}
-            value={hashtagText}
-            style={styles.textfield}
-            placeholder="#kultur #natur #mat"
-          />
-        </View>
-        <View style={styles.buttonContainer}>
+          </Modal>
           <Pressable
-            style={styles.primaryButton}
-            onPress={() => {
-              addNewPost({
-                title: titleText,
-                description: descriptionText,
-                id: `postName-${Date.now().toString()}-${titleText}`,
-                hashtags: hashtagText,
-                author: existingUser || "Anonym",
-                isLiked: false,
-                image: image || undefined,
-              });
-              setTitleText("");
-              setDescriptionText("");
-              setHashtagText("");
-            }}
+            onPress={() => setIsCameraOpen(true)}
+            style={styles.addImageBox}
           >
-            <Text style={{ color: "white" }}>Legg til post</Text>
+            {image ? (
+              <Image
+                source={{ uri: image }}
+                style={{ resizeMode: "cover", width: "100%", height: 300 }}
+                alt="Hmmmmm"
+              />
+            ) : (
+              <EvilIcons name="image" size={80} color="gray" />
+            )}
           </Pressable>
-          <Pressable
-            style={styles.secondaryButton}
-            onPress={() => closeModal()}
-          >
-            <Text
-              style={{
-                color: "#412E25",
+
+          <AntDesign name="smile" size={24} color={"gray"} />
+
+          <View style={styles.textFieldContainer}>
+            <Text style={styles.text}>Tittel</Text>
+            <TextInput
+              onChangeText={setTitleText}
+              value={titleText}
+              style={styles.textfield}
+              placeholder="Skriv inn tittel"
+            />
+          </View>
+          <View style={styles.textFieldContainer}>
+            <Text style={styles.text}>Beskrivelse</Text>
+            <TextInput
+              multiline
+              numberOfLines={3}
+              onChangeText={setDescriptionText}
+              value={descriptionText}
+              style={[styles.textfield, { height: 84 }]}
+              placeholder="Skriv inn beskrivelse"
+            />
+          </View>
+          <View style={styles.textFieldContainer}>
+            <Text style={styles.text}>Hashtags</Text>
+            <TextInput
+              onChangeText={setHashtagText}
+              value={hashtagText}
+              style={styles.textfield}
+              placeholder="#kultur #natur #mat"
+            />
+          </View>
+          <View style={styles.buttonContainer}>
+            <Pressable
+              style={styles.primaryButton}
+              onPress={() => {
+                addNewPost({
+                  title: titleText,
+                  description: descriptionText,
+                  id: `postName-${Date.now().toString()}-${titleText}`,
+                  hashtags: hashtagText,
+                  author: existingUser || "Anonym",
+                  isLiked: false,
+                  image: image || undefined,
+                });
+                setTitleText("");
+                setDescriptionText("");
+                setHashtagText("");
               }}
             >
-              Avbryt
-            </Text>
-          </Pressable>
-                    
+              <Text style={{ color: "white" }}>Legg til post</Text>
+            </Pressable>
+            <Pressable
+              style={styles.secondaryButton}
+              onPress={() => closeModal()}
+            >
+              <Text
+                style={{
+                  color: "#412E25",
+                }}
+              >
+                Avbryt
+              </Text>
+            </Pressable>
+          </View>
         </View>
-      </View>
       </ScrollView>
     </View>
   );
