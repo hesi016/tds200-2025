@@ -1,22 +1,22 @@
-import {
-  StyleSheet,
-  View,
-  Text,
-  Pressable,
-  FlatList,
-  Modal,
-} from "react-native";
-import Toast from 'react-native-toast-message';
-import { useState, useCallback } from "react";
+import Post from "@/components/Post";
+import PostForm from "@/components/PostForm";
+import Spacer from "@/components/Spacer";
+import { getAllPosts } from "@/utils/asyncPostData";
+import { PostData } from "@/utils/postData";
+import { Storage } from "@/utils/storage";
 import { useFocusEffect } from "@react-navigation/native";
 import { Stack } from "expo-router";
-import { Storage } from "@/utils/storage";
-import PostForm from "@/components/PostForm";
-import { PostData } from "@/utils/postData";
-import { getAllPosts } from "@/utils/asyncPostData";
-import Post from "@/components/Post";
-import Spacer from "@/components/Spacer";
-import React from "react";
+import React, { useCallback, useState } from "react";
+import {
+  FlatList,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import Toast from 'react-native-toast-message';
+
 export default function Index() {
   const [posts, setPosts] = useState<PostData[]>([]);
   const [userName, setUserName] = useState<string | null>(null);

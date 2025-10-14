@@ -1,26 +1,28 @@
 import { CameraView, useCameraPermissions } from "expo-camera";
-import { 
-  StyleSheet, 
-  Text, 
-  TouchableOpacity, 
-  View, 
-  Button,
-  Platform 
-} from "react-native";
-import { useRef } from "react";
-import * as ImagePicker from "expo-image-picker";
 import * as Device from "expo-device";
+import * as ImagePicker from "expo-image-picker";
+import React, { useRef } from "react";
+import {
+  Button,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 type SelectImageModalProps = {
   closeModal: () => void;
-  setImage: (image: string) => void;
+  setImages: (images: string[]) => void;
+  currentImages: string[];
 };
 
 export default function SelectImageModal({
   closeModal,
-  setImage,
+  setImages,
+  currentImages,
 }: SelectImageModalProps) {
-  const cameraRef = useRef<CameraView | null>(null);
+  const cameraRef = useRef<CameraView>(null);
   const [permission, requestPermission] = useCameraPermissions();
   const isIOSSimulator = Platform.OS === "ios" && !Device.isDevice;
 
@@ -46,63 +48,61 @@ export default function SelectImageModal({
   let camera: CameraView | null = null;
 
   const captureImage = async () => {
-  const photo = await cameraRef.current?.takePictureAsync();
-  if (photo?.uri) {
-    setImage(photo.uri);
-    closeModal();
-  }
-};
-    
+    const photo = await cameraRef.current?.takePictureAsync();
+    if (photo?.uri) {
+      setImages([...currentImages, photo.uri]);
+      closeModal();
+    }
+  };
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
+      allowsMultipleSelection: true,
       aspect: [4, 3],
       quality: 1,
     });
 
-
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      const uris = result.assets.map((a) => a.uri);
+      setImages([...currentImages, ...uris]);
       closeModal();
     }
   };
 
   return (
     <View style={styles.container}>
-      {/* preview  */}
-        {!isIOSSimulator ? (
-          <CameraView
-            ref={(r) => (cameraRef.current = r)}
-            style={StyleSheet.absoluteFill}
-            facing="back"
-          />
-        ) : (
-          <View style={[StyleSheet.absoluteFill, styles.simPanel]}>
-            <Text style={styles.text}>iOS Simulator — use “Velg bilde”</Text>
-          </View>
-        )}
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={() => pickImage()}>
-            <Text style={styles.text}>Velg bilde</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, isIOSSimulator && styles.buttonDisabled]}
-            disabled={isIOSSimulator}
-            onPress={!isIOSSimulator ? captureImage : undefined}
-            accessibilityState={{ disabled: isIOSSimulator }}
-          >
-            <Text style={styles.text}>Snap!</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => closeModal()}
-          >
-            <Text style={styles.text}>Avbryt</Text>
-          </TouchableOpacity>
+      {/* preview */}
+      {!isIOSSimulator ? (
+        <CameraView
+          ref={(r) => {
+            cameraRef.current = r;
+          }}
+          style={styles.camera}
+        />
+      ) : (
+        <View style={[StyleSheet.absoluteFill, styles.simPanel]}>
+          <Text style={styles.text}>iOS Simulator — use “Velg bilde”</Text>
         </View>
+      )}
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button} onPress={() => pickImage()}>
+          <Text style={styles.text}>Velg bilde</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.button, isIOSSimulator && styles.buttonDisabled]}
+          disabled={isIOSSimulator}
+          onPress={!isIOSSimulator ? captureImage : undefined}
+          accessibilityState={{ disabled: isIOSSimulator }}
+        >
+          <Text style={styles.text}>Snap!</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => closeModal()}>
+          <Text style={styles.text}>Avbryt</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -136,8 +136,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "white",
   },
-previewWrapper: { flex: 1, position: "relative" },
-overlay: { ...StyleSheet.absoluteFillObject, justifyContent: "flex-end" },
-simPanel: { backgroundColor: "#111", alignItems: "center", justifyContent: "center" },
-buttonDisabled: { opacity: 0.4 },
+  previewWrapper: { flex: 1, position: "relative" },
+  overlay: { ...StyleSheet.absoluteFillObject, justifyContent: "flex-end" },
+  simPanel: {
+    backgroundColor: "#111",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  buttonDisabled: { opacity: 0.4 },
 });

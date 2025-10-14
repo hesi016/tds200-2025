@@ -5,5 +5,5 @@ export interface PostData {
     hashtags: string;
     author: string;
     isLiked?: boolean;
-    image?: string;
+    image?: string[];
   }

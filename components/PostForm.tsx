@@ -24,7 +24,7 @@ export default function PostForm({ addNewPost, closeModal }: PostFormProps) {
   const [descriptionText, setDescriptionText] = useState("");
   const [hashtagText, setHashtagText] = useState("");
   const [existingUser, setExistingUser] = useState<string | null>(null);
-  const [image, setImage] = useState<string | null>(null);
+  const [images, setImages] = useState<string[]>([]);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
 
   useEffect(() => {
@@ -48,21 +48,32 @@ export default function PostForm({ addNewPost, closeModal }: PostFormProps) {
               closeModal={() => {
                 setIsCameraOpen(false);
               }}
-              setImage={setImage}
+              setImages={setImages}
+              currentImages={images}
             />
           </Modal>
           <Pressable
             onPress={() => setIsCameraOpen(true)}
             style={styles.addImageBox}
           >
-            {image ? (
-              <Image
-                source={{ uri: image }}
-                style={{ resizeMode: "cover", width: "100%", height: 300 }}
-                alt="Hmmmmm"
-              />
+            {images.length > 0 ? (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.imagePreviewContainer}
+              >
+                {images.map((image, index) => (
+                  <Image
+                    key={index}
+                    source={{ uri: image }}
+                    style={styles.imagePreview}
+                  />
+                ))}
+              </ScrollView>
             ) : (
-              <EvilIcons name="image" size={80} color="gray" />
+              <View style={{ alignItems: "center" }}>
+                <EvilIcons name="image" size={80} color="gray" />
+              </View>
             )}
           </Pressable>
 
@@ -108,7 +119,7 @@ export default function PostForm({ addNewPost, closeModal }: PostFormProps) {
                   hashtags: hashtagText,
                   author: existingUser || "Anonym",
                   isLiked: false,
-                  image: image || undefined,
+                  image: images || undefined,
                 });
                 setTitleText("");
                 setDescriptionText("");
@@ -141,6 +152,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    marginTop: 100,
   },
   contentContainer: {
     width: "100%",
@@ -204,4 +216,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "gray",
   },
+  imagePreviewContainer: { width: "100%", padding: 8 },
+  imagePreview: { width: 200, height: 280, marginRight: 8, borderRadius: 8 },
 });
