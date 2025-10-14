@@ -4,6 +4,7 @@ export interface PostData {
     id: string;
     hashtags: string;
     author: string;
+    imageURI: string | null;
     isLiked?: boolean;
     comments?: CommentData[];
   }

@@ -9,21 +9,34 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+        "infoPlist": {
+        "NSCameraUsageDescription": "We need access to your camera.",
+        "NSPhotoLibraryUsageDescription": "We need access to your photos to select images.",
+        "NSPhotoLibraryAddUsageDescription": "We save photos you take to your library.",
+        "NSMicrophoneUsageDescription": "We use the microphone when recording video."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+
+        "permissions": [
+        "CAMERA",
+        "READ_MEDIA_IMAGES",  
+        "READ_MEDIA_VIDEO",   
+        "READ_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "bundler": "metro",
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
-    "plugins": [
+ "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
@@ -33,8 +46,22 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "We need to access your camera so that you can take beautiful pictures!",
+          "microphonePermission": "We need the microphone when recording video."
+        }
       ]
     ],
+
     "experiments": {
       "typedRoutes": true
     }

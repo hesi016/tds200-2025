@@ -1,18 +1,19 @@
+import { CommentData, PostData } from "@/utils/postData";
 import { Storage } from "@/utils/storage";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { 
-  Text, 
-  View, 
-  StyleSheet, 
-  TextInput,
-  Pressable,
+import { useEffect, useState } from "react";
+import {
   ActivityIndicator,
-  FlatList
- } from "react-native";
-import { useState, useEffect } from "react";
-import { CommentData, PostData } from "@/utils/postData";
+  FlatList,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 
-export default function postDetails() {
+export default function PostDetails() {
   const { id } = useLocalSearchParams();
   const [posts, setPosts] = useState<PostData[]>([]);
   const [post, setPost] = useState<PostData | null>(null);
@@ -20,7 +21,6 @@ export default function postDetails() {
   const [isLoadingAddComment, setIsLoadingAddComment] = useState(false);
   const [isLoadingComments, setIsLoadingComments] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
-
   useEffect(() => {
     const fetchPostData = async () => {
       if (id) {
@@ -31,7 +31,7 @@ export default function postDetails() {
           const currentPost = allPosts.find((p: any) => p.id === id) || null;
           setPost(currentPost);
         } catch (e) {
-            console.error(e);
+          console.error(e);
         }
       }
     };
@@ -40,34 +40,33 @@ export default function postDetails() {
     fetchUser();
   }, [id]);
 
-    const fetchUser = async () => {
-      const email = await Storage.getItem("currentUserEmail");
-      setUserName(email);
-    };
+  const fetchUser = async () => {
+    const email = await Storage.getItem("currentUserEmail");
+    setUserName(email);
+  };
 
   const handleAddComment = async () => {
     if (!post || commentText.trim() === "") return;
 
     setIsLoadingAddComment(true);
     try {
-      const newComment:CommentData = {
+      const newComment: CommentData = {
         id: Date.now().toString(),
         authorId: userName ?? "Anonym",
         comment: commentText,
       };
-    const updatedPost: PostData = {
-      ...post,
-      comments: [newComment, ...(post.comments ?? [])],
-    };
-    setPost(updatedPost);
-    setCommentText("");
-//update posts array
-    const updatedPosts = posts.map((post) =>
-      post.id === id ? updatedPost : post
-    );
-    setPosts(updatedPosts); 
-    await Storage.setItem("posts", JSON.stringify(updatedPosts));
-
+      const updatedPost: PostData = {
+        ...post,
+        comments: [newComment, ...(post.comments ?? [])],
+      };
+      setPost(updatedPost);
+      setCommentText("");
+      //update posts array
+      const updatedPosts = posts.map((post) =>
+        post.id === id ? updatedPost : post
+      );
+      setPosts(updatedPosts);
+      await Storage.setItem("posts", JSON.stringify(updatedPosts));
     } catch (error) {
       console.error("Error adding comment:", error);
     }
@@ -75,30 +74,37 @@ export default function postDetails() {
   };
 
   return (
-    <View
-      style={styles.screenContainer}
-    >
+    <View style={styles.screenContainer}>
       <Stack.Screen
         options={{
           headerTitle: (props) => <Text>PostDetaljer</Text>,
           //headerShown: false
         }}
       />
-          <View style={styles.textContainer}>
-            <Text>{post?.title}</Text>
-            <Text style={styles.postHashtags}>{post?.hashtags}</Text>
-            <Text style={styles.authorText}>{post?.author}</Text>
+      <View style={styles.textContainer}>
+        <Text>{post?.title}</Text>
+        <Text style={styles.postHashtags}>{post?.hashtags}</Text>
+        <Text style={styles.authorText}>{post?.author}</Text>
+        {post?.imageURI ? (
+          <View style={styles.imageWrap}>
+            <Image
+              source={{ uri: post.imageURI }}
+              style={styles.postImage}
+              resizeMode="cover"
+            />
           </View>
+        ) : null}
+      </View>
 
-{/* Comments Section */}
-        <Text style={styles.sectionTitle}>Comments</Text>
-        {isLoadingComments ? (
-          <ActivityIndicator size="large" />
-        ) : (
+      {/* Comments Section */}
+      <Text style={styles.sectionTitle}>Comments</Text>
+      {isLoadingComments ? (
+        <ActivityIndicator size="large" />
+      ) : (
         <View style={styles.commentListContainer}>
           <FlatList
             data={post?.comments || []}
-            keyExtractor={(item : CommentData) => item.id}
+            keyExtractor={(item: CommentData) => item.id}
             renderItem={({ item }) => (
               <View style={styles.comment}>
                 <View style={styles.commentContent}>
@@ -109,28 +115,28 @@ export default function postDetails() {
             )}
           />
         </View>
-        )}
+      )}
 
-         {/* Add Comment Section */}
-        <View style={styles.commentInputContainer}>
-          <TextInput
-            value={commentText}
-            onChangeText={setCommentText}
-            placeholder="Write a comment..."
-            style={styles.commentInput}
-          />
-          <Pressable onPress={handleAddComment} style={styles.addCommentButton}>
-            {isLoadingAddComment ? (
-              <ActivityIndicator size="small" color="#fff" />
-            ) : (
-              <Text style={styles.addCommentButtonText}>add comment</Text>
-            )}
-          </Pressable>
-        </View>
+      {/* Add Comment Section */}
+      <View style={styles.commentInputContainer}>
+        <TextInput
+          value={commentText}
+          onChangeText={setCommentText}
+          placeholder="Write a comment..."
+          style={styles.commentInput}
+        />
+        <Pressable onPress={handleAddComment} style={styles.addCommentButton}>
+          {isLoadingAddComment ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={styles.addCommentButtonText}>add comment</Text>
+          )}
+        </Pressable>
+      </View>
     </View>
   );
 }
-const styles = StyleSheet.create({ 
+const styles = StyleSheet.create({
   screenContainer: {
     flex: 1,
     backgroundColor: "#F9FAFB",
@@ -222,5 +228,16 @@ const styles = StyleSheet.create({
     width: "60%",
     paddingHorizontal: 16,
     marginBottom: 16,
+  },
+  imageWrap: {
+    marginTop: 12,
+    borderRadius: 12,
+    overflow: "hidden",
+    backgroundColor: "#F3F4F6",
+    height: 220,
+  },
+  postImage: {
+    width: "100%",
+    height: "100%",
   },
 });
