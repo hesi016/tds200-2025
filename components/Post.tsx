@@ -39,7 +39,7 @@ export default function Post({ postData, toggleLike }: PostProps) {
           className="self-end mt-3 active:scale-95"
         >
           <AntDesign
-            name="smile-circle"
+            name="smile"
             size={28}
             color={postData.isLiked ? "#0ea5e9" : "gray"}
           />

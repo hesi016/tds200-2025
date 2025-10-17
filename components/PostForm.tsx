@@ -1,5 +1,5 @@
 import { PostData } from "../utils/postData";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   Pressable, 
   TextInput, 
@@ -9,7 +9,6 @@ import {
   ScrollView,
   Image 
 } from "react-native";
-import React from "react";
 import SelectImageModal from "./SelectImageModal";
 import { EvilIcons } from "@expo/vector-icons";
 import { Storage } from "../utils/storage";

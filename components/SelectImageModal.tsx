@@ -1,20 +1,14 @@
 import { CameraView, useCameraPermissions } from "expo-camera";
-import { 
-  StyleSheet, 
-  Text, 
-  TouchableOpacity, 
-  View, 
-  Button,
-  Platform 
-} from "react-native";
+import { Text, TouchableOpacity, View, Button, Platform } from "react-native";
 import { useRef } from "react";
 import * as ImagePicker from "expo-image-picker";
 import * as Device from "expo-device";
+import "../global.css";
 
 type SelectImageModalProps = {
   closeModal: () => void;
   setImages: (images: string[]) => void;
-  currentImages: string[];  
+  currentImages: string[];
 };
 
 export default function SelectImageModal({
@@ -24,9 +18,9 @@ export default function SelectImageModal({
 }: SelectImageModalProps) {
   const cameraRef = useRef<CameraView | null>(null);
   const [permission, requestPermission] = useCameraPermissions();
-  const isOSSimulator = (Platform.OS === "ios" && !Device.isDevice) ||
+  const isOSSimulator =
+    (Platform.OS === "ios" && !Device.isDevice) ||
     (Platform.OS === "android" && !Device.isDevice);
-
 
   if (!permission && !isOSSimulator) {
     console.log("No permission object");
@@ -37,9 +31,11 @@ export default function SelectImageModal({
   if (!isOSSimulator && permission && !permission.granted) {
     console.log("Permission not granted");
     // Camera permissions are not granted yet.
+
+    // Her og ned skal du style
     return (
-      <View style={styles.container}>
-        <Text style={styles.message}>
+      <View className="flex-1 justify-center">
+        <Text className="text-center mb-2.5">
           We need your permission to show the camera
         </Text>
         <Button onPress={requestPermission} title="grant permission" />
@@ -50,21 +46,20 @@ export default function SelectImageModal({
   let camera: CameraView | null = null;
 
   const captureImage = async () => {
-  const photo = await cameraRef.current?.takePictureAsync();
-  if (photo?.uri) {
-    // setImage(photo.uri);
-    setImages([...currentImages, photo.uri]); 
-    closeModal();
-  }
-};
-    
+    const photo = await cameraRef.current?.takePictureAsync();
+    if (photo?.uri) {
+      // setImage(photo.uri);
+      setImages([...currentImages, photo.uri]);
+      closeModal();
+    }
+  };
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
-      allowsMultipleSelection: true, 
+      allowsMultipleSelection: true,
       aspect: [4, 3],
       quality: 1,
     });
@@ -77,73 +72,43 @@ export default function SelectImageModal({
   };
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1 justify-center">
       {/* preview  */}
-        {!isOSSimulator ? (
-          <CameraView
-            ref={(r) => (cameraRef.current = r)}
-            style={StyleSheet.absoluteFill}
-            facing="back"
-          />
-        ) : (
-          <View style={[StyleSheet.absoluteFill, styles.simPanel]}>
-            <Text style={styles.text}>iOS Simulator — use “Velg bilde”</Text>
-          </View>
-        )}
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={() => pickImage()}>
-            <Text style={styles.text}>Velg bilde</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, isOSSimulator && styles.buttonDisabled]}
-            disabled={isOSSimulator}
-            onPress={!isOSSimulator ? captureImage : undefined}
-            accessibilityState={{ disabled: isOSSimulator }}
-          >
-            <Text style={styles.text}>Snap!</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => closeModal()}
-          >
-            <Text style={styles.text}>Avbryt</Text>
-          </TouchableOpacity>
+      {!isOSSimulator ? (
+        <CameraView
+          ref={cameraRef}
+          className="absolute inset-0 justify-end"
+          facing="back"
+        />
+      ) : (
+        <View className="absolute inset-0 bg-[#111] items-center justify-center">
+          <Text className="text-2xl font-bold text-white">
+            iOS Simulator — use “Velg bilde”
+          </Text>
         </View>
+      )}
+      <View className="flex-1 flex-row bg-transparent justify-between mb-16">
+        <TouchableOpacity
+          className="flex-1 self-end items-center"
+          onPress={() => pickImage()}
+        >
+          <Text className="text-2xl font-bold color-white">Velg bilde</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          className={`flex-1 self-end items-center mx-4 rounded bg-blue-600 py-3 ${isOSSimulator ? "opacity-40" : "opacity-100"}`}
+          disabled={isOSSimulator}
+          onPress={!isOSSimulator ? captureImage : undefined}
+          accessibilityState={{ disabled: isOSSimulator }}
+        >
+          <Text className="text-2xl font-bold color-white">Snap!</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          className="flex-1 self-end items-center"
+          onPress={() => closeModal()}
+        >
+          <Text className="text-2xl font-bold color-white">Avbryt</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-  },
-  message: {
-    textAlign: "center",
-    paddingBottom: 10,
-  },
-  camera: {
-    flex: 1,
-  },
-  buttonContainer: {
-    flex: 1,
-    flexDirection: "row",
-    backgroundColor: "transparent",
-    justifyContent: "space-between",
-    marginBottom: 64,
-  },
-  button: {
-    flex: 1,
-    alignSelf: "flex-end",
-    alignItems: "center",
-  },
-  text: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "white",
-  },
-previewWrapper: { flex: 1, position: "relative" },
-overlay: { ...StyleSheet.absoluteFillObject, justifyContent: "flex-end" },
-simPanel: { backgroundColor: "#111", alignItems: "center", justifyContent: "center" },
-buttonDisabled: { opacity: 0.4 },
-});
